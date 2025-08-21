@@ -24,10 +24,12 @@ jobs:
       - name: Scan SBOM for vulnerabilities
         run: |
           docker run --rm -v ${{ github.workspace }}:/project \
-            ghcr.io/aquasecurity/trivy sbom --severity HIGH,CRITICAL --format table /project/sbom.json
+            ghcr.io/aquasecurity/trivy sbom --severity HIGH,CRITICAL --format table /project/sbom.json > trivy-report.json
 
-      - name: Upload SBOM as artifact
+      - name: Upload SBOM and Scan Report
         uses: actions/upload-artifact@v4
         with:
-          name: nodejs-sbom
-          path: sbom.json
+          name: trivy-sbom-and-report
+          path: |
+            sbom.json
+            trivy-report.json
