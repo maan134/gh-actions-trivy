@@ -1,4 +1,4 @@
-name: Trivy SBOM Scan (Node.js)
+name: Trivy SBOM Scan (GHCR)
 
 on:
   push:
@@ -6,32 +6,28 @@ on:
   pull_request:
 
 jobs:
-  trivy-node-sbom:
+  trivy-sbom:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'   # use your Node.js version
-
       - name: Install dependencies
-        run: npm install   # or `yarn install` if you use Yarn
-
-      - name: Install Trivy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.57.0_Linux-64bit.deb
-          sudo dpkg -i trivy_0.57.0_Linux-64bit.deb
+        run: npm install   # or yarn install if you use Yarn
 
       - name: Generate SBOM
         run: |
-          trivy fs --format cyclonedx --output sbom.json .
+          docker run --rm -v ${{ github.workspace }}:/project \
+            ghcr.io/aquasecurity/trivy fs --format cyclonedx --output /project/sbom.json /project
 
-      - name: Scan SBOM for Vulnerabilities
+      - name: Scan SBOM for vulnerabilities
         run: |
-          trivy sbom --severity HIGH,CRITICAL sbom.json --format table
+          docker run --rm -v ${{ github.workspace }}:/project \
+            ghcr.io/aquasecurity/trivy sbom --severity HIGH,CRITICAL --format table /project/sbom.json
+
+      - name: Upload SBOM as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nodejs-sbom
+          path: sbom.json
