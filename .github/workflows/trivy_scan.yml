@@ -1,0 +1,37 @@
+name: Trivy SBOM Scan (Node.js)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  trivy-node-sbom:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'   # use your Node.js version
+
+      - name: Install dependencies
+        run: npm install   # or `yarn install` if you use Yarn
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.57.0_Linux-64bit.deb
+          sudo dpkg -i trivy_0.57.0_Linux-64bit.deb
+
+      - name: Generate SBOM
+        run: |
+          trivy fs --format cyclonedx --output sbom.json .
+
+      - name: Scan SBOM for Vulnerabilities
+        run: |
+          trivy sbom --severity HIGH,CRITICAL sbom.json --format table
