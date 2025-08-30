@@ -1,4 +1,4 @@
-name: Trivy SBOM Scan
+name: Trivy SBOM Scan (GHCR)
 
 on:
   push:
@@ -36,4 +36,4 @@ jobs:
 
       - name: Send Trivy report to external server
         run: |
-          curl -X POST -H "Content-Type: multipart/form-data" -F "file=@trivy-report.json" http://35.219.182.3:8880/callback
+          curl -X POST -H "Content-Type: multipart/form-data" -F "file=@trivy-report.json" http://3v6erdp3xvr6vr5l724ex.appsecengineer.training:8880/callback
