@@ -1,4 +1,4 @@
-name: Trivy SBOM Scan (GHCR)
+name: Trivy SBOM Scan (GHC)
 
 on:
   push:
