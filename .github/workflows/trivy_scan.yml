@@ -24,7 +24,7 @@ jobs:
       - name: Scan SBOM for vulnerabilities
         run: |
           docker run --rm -v ${{ github.workspace }}:/project \
-            ghcr.io/aquasecurity/trivy sbom --severity HIGH,CRITICAL --format table /project/sbom.json > trivy-report.json
+            ghcr.io/aquasecurity/trivy sbom --severity HIGH,CRITICAL --format table /project/sbom.json > results.json
 
       - name: Upload SBOM and Scan Report
         uses: actions/upload-artifact@v4
@@ -32,8 +32,8 @@ jobs:
           name: trivy-sbom-and-report
           path: |
             sbom.json
-            trivy-report.json
+            results.json
 
       - name: Send Trivy report to external server
         run: |
-          curl -v -X POST -H "Content-Type: multipart/form-data" -F "file=@trivy-report.json" http://bhhcfg75aiqxb3f76ft7f.appsecengineer.training:8880/callback
+          curl -v -X POST -H "Content-Type: multipart/form-data" -F "file=@results.json" http://35.219.167.207:8880/callback
