@@ -14,20 +14,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: npm install   # or yarn install if you use Yarn
-
-      - name: Install CycloneDX CLI
-        run: |
-          curl -sSL https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -o cyclonedx
-          chmod +x cyclonedx
-          sudo mv cyclonedx /usr/local/bin/
+        run: npm install -g @cyclonedx/cyclonedx-npm   # or yarn install if you use Yarn
 
       - name: Generate SBOM in JSON
         run: |
-          cyclonedx-npm \
-            --output-file sbom.json \
-            --output-format json \
-            --exclude-dev
+          cyclonedx-npm --output-file sbom.json --output-format json
 
       - name: Upload SBOM and Scan Report
         uses: actions/upload-artifact@v4
