@@ -19,8 +19,7 @@ jobs:
       - name: Generate SBOM
         run: |
           docker run --rm -v ${{ github.workspace }}:/project \
-            ghcr.io/aquasecurity/trivy fs --format cyclonedx-npm --output /project/sbom.json /project
-
+            cyclonedx-npm --output-file /project/sbom.json
       - name: Upload SBOM and Scan Report
         uses: actions/upload-artifact@v4
         with:
