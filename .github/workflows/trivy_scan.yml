@@ -1,4 +1,4 @@
-name: Trivy SBOM Scan (GHC)
+name: SBOM Scan (GHC)
 
 on:
   push:
@@ -16,17 +16,26 @@ jobs:
       - name: Install dependencies
         run: npm install   # or yarn install if you use Yarn
 
-      - name: Generate SBOM
+      - name: Install CycloneDX CLI
         run: |
-          docker run --rm -v ${{ github.workspace }}:/project \
-            cyclonedx-npm --output-file /project/sbom.json
+          curl -sSL https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -o cyclonedx
+          chmod +x cyclonedx
+          sudo mv cyclonedx /usr/local/bin/
+
+      - name: Generate SBOM in JSON
+        run: |
+          cyclonedx-npm \
+            --output-file sbom.json \
+            --output-format json \
+            --exclude-dev
+
       - name: Upload SBOM and Scan Report
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-sbom-and-report
+          name: sbom-and-report
           path: |
             sbom.json
             
-      - name: Send Trivy report to external server
+      - name: Send report to external server
         run: |
           curl -v -X POST -H "Content-Type: multipart/form-data" -F "file=@sbom.json" http://1cj94e4m3tzu68q7db3j1.appsecengineer.training:8880/callback
